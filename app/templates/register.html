@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - AnalisaVet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <div class="logo">
+                <h1>🐾 AnalisaVet</h1>
+            </div>
+            <nav class="main-nav">
+                <a href="/" class="btn btn-secondary">Voltar para Início</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="auth-section">
+            <div class="card">
+                <h2>Registro</h2>
+                <p>Crie uma nova conta para acessar o sistema AnalisaVet.</p>
+                
+                <div id="register-error" class="error-message" style="display: none;"></div>
+                
+                <form id="register-form" class="auth-form">
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Senha:</label>
+                        <input type="password" id="password" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirm-password">Confirmar Senha:</label>
+                        <input type="password" id="confirm-password" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-lg">Registrar</button>
+                    </div>
+                </form>
+                
+                <div class="auth-links">
+                    <p>Já tem uma conta? <a href="/login">Faça login</a></p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <p>AnalisaVet - Sistema de Análise de Hemograma Veterinário</p>
+            <p class="disclaimer">Este sistema é uma ferramenta de apoio e não substitui a avaliação de um médico veterinário.</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const registerForm = document.getElementById('register-form');
+            const errorMessage = document.getElementById('register-error');
+            
+            registerForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // Limpa mensagem de erro anterior
+                errorMessage.style.display = 'none';
+                
+                // Coleta dados do formulário
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+                
+                // Verifica se as senhas coincidem
+                if (password !== confirmPassword) {
+                    errorMessage.textContent = 'As senhas não coincidem.';
+                    errorMessage.style.display = 'block';
+                    return;
+                }
+                
+                try {
+                    // Envia requisição de registro
+                    const response = await Utils.fetchAPI('/api/auth/register', {
+                        method: 'POST',
+                        body: {
+                            email: email,
+                            password: password
+                        }
+                    });
+                    
+                    if (response.success) {
+                        // Exibe mensagem de sucesso e redireciona para login
+                        alert('Registro realizado com sucesso! Você será redirecionado para a página de login.');
+                        window.location.href = '/login';
+                    }
+                } catch (error) {
+                    // Exibe mensagem de erro
+                    errorMessage.textContent = error.message || 'Erro ao registrar. Verifique os dados e tente novamente.';
+                    errorMessage.style.display = 'block';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

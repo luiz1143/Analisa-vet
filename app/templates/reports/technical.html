@@ -1,0 +1,169 @@
+
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laudo Técnico - AnalisaVet</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.5;
+            color: #333;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .clinic-info {
+            flex: 1;
+            text-align: left;
+        }
+        .logo {
+            max-width: 150px;
+            max-height: 100px;
+            display: block;
+            margin-left: auto;
+            margin-right: 0;
+        }
+        .patient-info {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .alto {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .baixo {
+            color: #007bff;
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 10pt;
+            color: #6c757d;
+        }
+        .diagnosis {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #e9f5f8;
+            border-radius: 5px;
+            border-left: 5px solid #3b7a8a;
+        }
+        .recommendation {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border-left: 5px solid #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="clinic-info">
+            <h1>Laudo Técnico - Hemograma</h1>
+            <p><strong>{{ clinic.nome }}</strong></p>
+            <p>{{ clinic.endereco }}</p>
+            <p>{{ clinic.telefone }} | {{ clinic.email }}</p>
+            <p>CRMV: {{ clinic.crmv }}</p>
+        </div>
+        {% if clinic.logo_path %}
+        <img src="{{ clinic.logo_path }}" alt="Logo da Clínica" class="logo">
+        {% endif %}
+    </div>
+
+    <div class="patient-info">
+        <h2>Informações do Paciente</h2>
+        <p><strong>Nome:</strong> {{ patient.nome_paciente }}</p>
+        <p><strong>Espécie:</strong> {{ patient.especie }}</p>
+        <p><strong>Raça:</strong> {{ patient.raca }}</p>
+        <p><strong>Idade:</strong> {{ patient.idade }}</p>
+        <p><strong>Sexo:</strong> {{ patient.sexo }}</p>
+        <p><strong>Tutor:</strong> {{ patient.nome_tutor }}</p>
+        <p><strong>Data:</strong> {{ date }} | <strong>Hora:</strong> {{ time }}</p>
+    </div>
+
+    <div class="results">
+        <h2>Resultados do Hemograma</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Parâmetro</th>
+                    <th>Resultado</th>
+                    <th>Referência</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in analysis.alteracoes %}
+                <tr>
+                    <td>{{ item.parametro|capitalize }}</td>
+                    <td class="{{ item.classificacao }}">{{ item.valor }}</td>
+                    <td>{{ item.referencia }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="diagnosis">
+        <h2>Diagnóstico</h2>
+        {% for diagnostico in analysis.diagnosticos %}
+        <p><strong>{{ diagnostico }}</strong></p>
+        {% endfor %}
+        
+        <h3>Interpretação</h3>
+        {% for explicacao in analysis.explicacoes %}
+        <p>{{ explicacao.interpretacao }}</p>
+        {% endfor %}
+    </div>
+
+    <div class="recommendation">
+        <h2>Recomendações</h2>
+        {% for explicacao in analysis.explicacoes %}
+        <p>{{ explicacao.recomendacao }}</p>
+        {% endfor %}
+    </div>
+
+    <div class="diagnosis">
+        <h2>Conclusão Clínica</h2>
+        <h3>Estado Geral e Aptidão Cirúrgica</h3>
+        <p><strong>{{ analysis.conclusao_clinica.conclusao_tecnica }}</strong></p>
+        
+        <div style="margin-top: 15px; padding: 10px; background-color: #f8f9fa; border-radius: 5px;">
+            <p><strong>Classificação:</strong></p>
+            <ul>
+                <li><strong>Gravidade geral:</strong> {{ analysis.conclusao_clinica.gravidade_geral|capitalize }}</li>
+                <li><strong>Risco cirúrgico:</strong> {{ analysis.conclusao_clinica.risco_cirurgico|capitalize }}</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Este laudo foi gerado automaticamente pelo sistema AnalisaVet.</p>
+        <p>Os resultados devem ser interpretados pelo médico veterinário responsável, considerando o quadro clínico completo do paciente.</p>
+    </div>
+</body>
+</html>
+
+
+

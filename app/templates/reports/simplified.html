@@ -1,0 +1,120 @@
+"""
+Template HTML para laudo simplificado do AnalisaVet.
+Versão para tutores com linguagem acessível.
+"""
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laudo Simplificado - AnalisaVet</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .clinic-info {
+            flex: 1;
+            text-align: left;
+        }
+        .logo {
+            max-width: 150px;
+            max-height: 100px;
+            display: block;
+            margin-left: auto;
+            margin-right: 0;
+        }
+        .patient-info {
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            font-size: 16pt;
+        }
+        .diagnosis {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #e9f5f8;
+            border-radius: 10px;
+            border-left: 5px solid #3b7a8a;
+        }
+        .explanation {
+            margin-bottom: 30px;
+        }
+        .recommendation {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #28a745;
+        }
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 12pt;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="clinic-info">
+            <h1>Laudo Simplificado - Hemograma</h1>
+            <p><strong>{{ clinic.nome }}</strong></p>
+            <p>{{ clinic.endereco }}</p>
+            <p>{{ clinic.telefone }} | {{ clinic.email }}</p>
+            <p>CRMV: {{ clinic.crmv }}</p>
+        </div>
+        {% if clinic.logo_path %}
+        <img src="{{ clinic.logo_path }}" alt="Logo da Clínica" class="logo">
+        {% endif %}
+    </div>
+
+    <div class="patient-info">
+        <h2>Informações do Pet</h2>
+        <p><strong>Nome:</strong> {{ patient.nome_paciente }}</p>
+        <p><strong>Espécie:</strong> {{ patient.especie }}</p>
+        <p><strong>Raça:</strong> {{ patient.raca }}</p>
+        <p><strong>Idade:</strong> {{ patient.idade }}</p>
+        <p><strong>Sexo:</strong> {{ patient.sexo }}</p>
+        <p><strong>Tutor:</strong> {{ patient.nome_tutor }}</p>
+        <p><strong>Data:</strong> {{ date }} | <strong>Hora:</strong> {{ time }}</p>
+    </div>
+
+    <div class="diagnosis">
+        <h2>O que foi encontrado no exame</h2>
+        {% for diagnostico in analysis.diagnosticos %}
+        <p><strong>{{ diagnostico }}</strong></p>
+        {% endfor %}
+    </div>
+
+    <div class="explanation">
+        <h2>O que isso significa</h2>
+        {% for explicacao in analysis.explicacoes %}
+        <p>{{ explicacao.interpretacao }}</p>
+        {% endfor %}
+    </div>
+
+    <div class="recommendation">
+        <h2>O que fazer agora</h2>
+        {% for explicacao in analysis.explicacoes %}
+        <p>{{ explicacao.recomendacao }}</p>
+        {% endfor %}
+    </div>
+
+    <div class="footer">
+        <p>Este laudo foi gerado automaticamente pelo sistema AnalisaVet.</p>
+        <p>Em caso de dúvidas, entre em contato com a clínica veterinária.</p>
+    </div>
+</body>
+</html>
+
+

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento Não Aprovado - AnalisaVet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        .failure-container {
+            text-align: center;
+            padding: 50px 20px;
+        }
+        .failure-icon {
+            font-size: 4em;
+            color: #dc3545;
+            margin-bottom: 20px;
+        }
+        .failure-message {
+            font-size: 1.5em;
+            color: #dc3545;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <div class="logo">
+                <h1><a href="{{ url_for('index') }}">🐾 AnalisaVet</a></h1>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="failure-container">
+            <div class="failure-icon">❌</div>
+            <h2 class="failure-message">Pagamento Não Aprovado</h2>
+            <p>Houve um problema com seu pagamento. Nenhum valor foi cobrado.</p>
+            <p>Você pode tentar novamente ou entrar em contato conosco se o problema persistir.</p>
+            <div style="margin-top: 30px;">
+                <a href="{{ url_for('payment.buy_credits_page') }}" class="btn btn-primary">Tentar Novamente</a>
+                <a href="{{ url_for('index') }}" class="btn btn-secondary">Voltar ao Sistema</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <p>AnalisaVet - Sistema de Análise de Hemograma Veterinário</p>
+        </div>
+    </footer>
+</body>
+</html>
+

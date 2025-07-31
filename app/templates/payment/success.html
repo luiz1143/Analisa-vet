@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento Aprovado - AnalisaVet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        .success-container {
+            text-align: center;
+            padding: 50px 20px;
+        }
+        .success-icon {
+            font-size: 4em;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+        .success-message {
+            font-size: 1.5em;
+            color: #28a745;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <div class="logo">
+                <h1><a href="{{ url_for('index') }}">🐾 AnalisaVet</a></h1>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="success-container">
+            <div class="success-icon">✅</div>
+            <h2 class="success-message">Pagamento Aprovado!</h2>
+            <p>Seus créditos foram adicionados à sua conta com sucesso.</p>
+            <p>Você já pode continuar usando o AnalisaVet para suas análises de hemograma.</p>
+            <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">Voltar ao Sistema</a>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <p>AnalisaVet - Sistema de Análise de Hemograma Veterinário</p>
+        </div>
+    </footer>
+</body>
+</html>
+

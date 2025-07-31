@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento Pendente - AnalisaVet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        .pending-container {
+            text-align: center;
+            padding: 50px 20px;
+        }
+        .pending-icon {
+            font-size: 4em;
+            color: #ffc107;
+            margin-bottom: 20px;
+        }
+        .pending-message {
+            font-size: 1.5em;
+            color: #ffc107;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <div class="logo">
+                <h1><a href="{{ url_for('index') }}">🐾 AnalisaVet</a></h1>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="pending-container">
+            <div class="pending-icon">⏳</div>
+            <h2 class="pending-message">Pagamento Pendente</h2>
+            <p>Seu pagamento está sendo processado.</p>
+            <p>Você receberá uma confirmação por email assim que o pagamento for aprovado.</p>
+            <p>Os créditos serão adicionados automaticamente à sua conta.</p>
+            <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">Voltar ao Sistema</a>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <p>AnalisaVet - Sistema de Análise de Hemograma Veterinário</p>
+        </div>
+    </footer>
+</body>
+</html>
+

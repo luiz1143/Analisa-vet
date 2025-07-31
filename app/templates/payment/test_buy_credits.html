@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste - Comprar Créditos - AnalisaVet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+    <style>
+        .package-card {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .package-card:hover {
+            border-color: #3b7a8a;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .package-card.selected {
+            border-color: #3b7a8a;
+            background-color: #f8f9fa;
+        }
+        .package-price {
+            font-size: 2em;
+            font-weight: bold;
+            color: #3b7a8a;
+            margin: 10px 0;
+        }
+        .package-credits {
+            font-size: 1.2em;
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+        .package-discount {
+            background-color: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .payment-section {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+        }
+        .current-credits {
+            background-color: #e9f5f8;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <div class="logo">
+                <h1><a href="{{ url_for('index') }}">🐾 AnalisaVet</a></h1>
+            </div>
+            <nav class="main-nav">
+                <a href="{{ url_for('index') }}" class="btn btn-secondary btn-sm">Voltar ao Sistema</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="intro-section">
+            <h2>💳 Teste - Comprar Créditos</h2>
+            <p>Esta é uma página de teste para verificar o funcionamento do botão 'Comprar Créditos'. Cada análise de hemograma consome 1 crédito.</p>
+        </section>
+
+        <div class="current-credits">
+            <h3>Seus Créditos Atuais</h3>
+            <p><strong id="current-credits-display">21999989</strong> créditos disponíveis</p>
+        </div>
+
+        <section class="packages-section">
+            <h3>Escolha seu Pacote</h3>
+            <div class="packages-grid">
+                <div class="package-card" data-package-id="10">
+                    <div class="package-credits">10 análises</div>
+                    <div class="package-price">R$ 29,90</div>
+                    <div class="package-description">Pacote Básico</div>
+                </div>
+                
+                <div class="package-card" data-package-id="25">
+                    <div class="package-credits">25 análises</div>
+                    <div class="package-price">R$ 67,50</div>
+                    <div class="package-description">Pacote Intermediário</div>
+                    <div class="package-discount">10% de desconto</div>
+                </div>
+                
+                <div class="package-card" data-package-id="50">
+                    <div class="package-credits">50 análises</div>
+                    <div class="package-price">R$ 119,60</div>
+                    <div class="package-description">Pacote Avançado</div>
+                    <div class="package-discount">20% de desconto</div>
+                </div>
+                
+                <div class="package-card" data-package-id="100">
+                    <div class="package-credits">100 análises</div>
+                    <div class="package-price">R$ 209,30</div>
+                    <div class="package-description">Pacote Premium</div>
+                    <div class="package-discount">30% de desconto</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="payment-section" id="payment-section" style="display: none;">
+            <h3>Finalizar Compra</h3>
+            <div id="selected-package-info"></div>
+            <button id="btn-pay" class="btn btn-primary btn-lg">💳 Pagar com Mercado Pago</button>
+            <div id="payment-status" class="status-message"></div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <p>AnalisaVet - Sistema de Análise de Hemograma Veterinário</p>
+            <p class="disclaimer">Pagamentos processados com segurança pelo Mercado Pago.</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+    <script>
+        // Versão simplificada do payment.js para teste
+        const TestPayment = {
+            selectedPackage: null,
+            
+            init: function() {
+                console.log("TestPayment.init() called!");
+                
+                // Adiciona listeners para os cartões de pacotes
+                const packageCards = document.querySelectorAll('.package-card');
+                packageCards.forEach(card => {
+                    card.addEventListener('click', this.selectPackage.bind(this));
+                });
+                
+                // Adiciona listener para o botão de pagamento
+                const btnPay = document.getElementById('btn-pay');
+                if (btnPay) {
+                    btnPay.addEventListener('click', this.processPayment.bind(this));
+                }
+            },
+            
+            selectPackage: function(event) {
+                console.log("Package card clicked!");
+                const card = event.currentTarget;
+                const packageId = card.dataset.packageId;
+                
+                // Remove seleção anterior
+                document.querySelectorAll('.package-card').forEach(c => {
+                    c.classList.remove('selected');
+                });
+                
+                // Adiciona seleção atual
+                card.classList.add('selected');
+                this.selectedPackage = packageId;
+                
+                // Mostra seção de pagamento
+                this.showPaymentSection(packageId);
+            },
+            
+            showPaymentSection: function(packageId) {
+                const paymentSection = document.getElementById('payment-section');
+                const packageInfo = document.getElementById('selected-package-info');
+                
+                // Dados dos pacotes para teste
+                const packages = {
+                    '10': { descricao: 'Pacote Básico', preco: 29.90, creditos: 10 },
+                    '25': { descricao: 'Pacote Intermediário', preco: 67.50, creditos: 25 },
+                    '50': { descricao: 'Pacote Avançado', preco: 119.60, creditos: 50 },
+                    '100': { descricao: 'Pacote Premium', preco: 209.30, creditos: 100 }
+                };
+                
+                const packageData = packages[packageId];
+                if (packageData) {
+                    packageInfo.innerHTML = `
+                        <div style="background-color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                            <h4>Pacote Selecionado</h4>
+                            <p><strong>${packageData.descricao}</strong></p>
+                            <p>Valor: <strong>R$ ${packageData.preco.toFixed(2)}</strong></p>
+                            <p>Você receberá: <strong>${packageData.creditos} créditos</strong></p>
+                        </div>
+                    `;
+                    
+                    paymentSection.style.display = 'block';
+                    paymentSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            },
+            
+            processPayment: function() {
+                if (!this.selectedPackage) {
+                    alert('Selecione um pacote primeiro.');
+                    return;
+                }
+                
+                const statusDiv = document.getElementById('payment-status');
+                statusDiv.innerHTML = '<p style="color: green;">✅ Teste: Botão funcionando corretamente! Em produção, redirecionaria para o Mercado Pago.</p>';
+                console.log('Teste: Processamento de pagamento iniciado para o pacote:', this.selectedPackage);
+            }
+        };
+
+        // Inicializa quando o DOM estiver carregado
+        document.addEventListener("DOMContentLoaded", function() {
+            console.log("DOMContentLoaded event fired. Initializing TestPayment module.");
+            TestPayment.init();
+        });
+    </script>
+</body>
+</html>
+

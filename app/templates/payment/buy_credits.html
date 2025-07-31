@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprar Créditos - AnalisaVet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+    <style>
+        .package-card {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .package-card:hover {
+            border-color: #3b7a8a;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .package-card.selected {
+            border-color: #3b7a8a;
+            background-color: #f8f9fa;
+        }
+        .package-price {
+            font-size: 2em;
+            font-weight: bold;
+            color: #3b7a8a;
+            margin: 10px 0;
+        }
+        .package-credits {
+            font-size: 1.2em;
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+        .package-discount {
+            background-color: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .payment-section {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+        }
+        .current-credits {
+            background-color: #e9f5f8;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <div class="logo">
+                <h1><a href="{{ url_for('index') }}">🐾 AnalisaVet</a></h1>
+            </div>
+            <nav class="main-nav">
+                <a href="{{ url_for('index') }}" class="btn btn-secondary btn-sm">Voltar ao Sistema</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="intro-section">
+            <h2>💳 Comprar Créditos</h2>
+            <p>Escolha um pacote de créditos para continuar usando o AnalisaVet. Cada análise de hemograma consome 1 crédito.</p>
+        </section>
+
+        <div class="current-credits">
+            <h3>Seus Créditos Atuais</h3>
+            <p><strong id="current-credits-display">{% if current_user %}{{ current_user.credits }}{% else %}0{% endif %}</strong> créditos disponíveis</p>
+        </div>
+
+        <section class="packages-section">
+            <h3>Escolha seu Pacote</h3>
+            <div class="packages-grid">
+                {% for package_id, package in packages.items() %}
+                <div class="package-card" data-package-id="{{ package_id }}">
+                    <div class="package-credits">{{ package.creditos }} análises</div>
+                    <div class="package-price">R$ {{ "%.2f"|format(package.preco) }}</div>
+                    <div class="package-description">{{ package.descricao }}</div>
+                    {% if package_id != '10' %}
+                    <div class="package-discount">
+                        {% if package_id == '25' %}10% de desconto{% endif %}
+                        {% if package_id == '50' %}20% de desconto{% endif %}
+                        {% if package_id == '100' %}30% de desconto{% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="payment-section" id="payment-section" style="display: none;">
+            <h3>Finalizar Compra</h3>
+            <div id="selected-package-info"></div>
+            <button id="btn-pay" class="btn btn-primary btn-lg">💳 Pagar com Mercado Pago</button>
+            <div id="payment-status" class="status-message"></div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <p>AnalisaVet - Sistema de Análise de Hemograma Veterinário</p>
+            <p class="disclaimer">Pagamentos processados com segurança pelo Mercado Pago.</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/payment.js') }}"></script>
+</body>
+</html>
+

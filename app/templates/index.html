@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnalisaVet - Sistema de Análise de Hemograma Veterinário</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <div class="logo">
+                <h1>🐾 AnalisaVet</h1>
+            </div>
+            <nav class="main-nav">
+                <div id="auth-section">
+<div id="login-register-section">
+                        <a href="{{ url_for("login") }}" id="login-btn" class="btn btn-secondary btn-sm">Login</a>
+                        <a href="{{ url_for("register") }}" id="register-btn" class="btn btn-secondary btn-sm">Registrar</a>
+                        <a href="{{ url_for("payment.buy_credits_page") }}" id="buy-credits-anon-btn" class="btn btn-success btn-sm">💳 Comprar Créditos</a>
+                    </div>
+                    <div id="user-info-section" style="display: none;">
+                        <span>Bem-vindo, <span id="user-display"></span>!</span>
+                        <span>(<span id="credits-display"></span> créditos)</span>
+                        <button id="btn-clinic-config" class="btn btn-info btn-sm">⚙️ Clínica</button>
+                        <button id="btn-buy-credits" class="btn btn-success btn-sm">💳 Comprar Créditos</button>
+                        <button id="logout-btn" class="btn btn-danger btn-sm">Sair</button>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="intro-section">
+            <h2>Análise de Hemograma Veterinário</h2>
+            <p>Bem-vindo ao AnalisaVet, o sistema inteligente para análise de hemogramas veterinários. Faça upload de um arquivo PDF/CSV ou preencha os dados manualmente para obter uma análise detalhada.</p>
+        </section>
+
+        <section class="upload-section card">
+            <h3>Carregar Arquivo de Hemograma</h3>
+            <div class="form-group">
+                <label for="hemograma-file">Selecione um arquivo PDF ou CSV:</label>
+                <input type="file" id="hemograma-file" class="form-control" accept=".pdf,.csv">
+            </div>
+            <button id="btn-upload" class="btn btn-primary">⬆️ Carregar e Preencher</button>
+            <div id="upload-status" class="status-message"></div>
+        </section>
+
+        <section class="patient-info-section card">
+            <h3>Informações do Paciente</h3>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="nome-paciente">Nome do Paciente:</label>
+                    <input type="text" id="nome-paciente" class="form-control">
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="nome-tutor">Nome do Tutor:</label>
+                    <input type="text" id="nome-tutor" class="form-control">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label for="raca">Raça:</label>
+                    <input type="text" id="raca" class="form-control">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="idade">Idade:</label>
+                    <input type="text" id="idade" class="form-control">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="sexo">Sexo:</label>
+                    <select id="sexo" class="form-control">
+                        <option value="">Selecione</option>
+                        <option value="Macho">Macho</option>
+                        <option value="Fêmea">Fêmea</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label for="finalidade-exame">Qual a finalidade do exame?</label>
+                    <select id="finalidade-exame" class="form-control">
+                        <option value="">Selecione a finalidade</option>
+                        <option value="cirurgico">Cirúrgico/procedimento</option>
+                        <option value="rotina">Exame de rotina</option>
+                        <option value="diagnostico">Análises diagnóstica (Clínica)</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <section id="clinic-config-section" class="clinic-config-section card" style="display: none;">
+            <h3>⚙️ Configurações da Clínica</h3>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="clinic-name">Nome da Clínica:</label>
+                    <input type="text" id="clinic-name" class="form-control" placeholder="Clínica Veterinária">
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="clinic-email">Email da Clínica:</label>
+                    <input type="email" id="clinic-email" class="form-control" placeholder="contato@clinicavet.com">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-8">
+                    <label for="clinic-address">Endereço:</label>
+                    <input type="text" id="clinic-address" class="form-control" placeholder="Rua Exemplo, 123">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="clinic-phone">Telefone:</label>
+                    <input type="text" id="clinic-phone" class="form-control" placeholder="(11) 1234-5678">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="clinic-crmv">CRMV:</label>
+                    <input type="text" id="clinic-crmv" class="form-control" placeholder="CRMV-XX 12345">
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="clinic-logo">Logo da Clínica:</label>
+                    <input type="file" id="clinic-logo" class="form-control" accept=".png,.jpg,.jpeg,.gif,.svg">
+                    <small class="form-text text-muted">Formatos aceitos: PNG, JPG, JPEG, GIF, SVG</small>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <div id="current-logo-preview" style="display: none;">
+                        <label>Logo Atual:</label>
+                        <div class="logo-preview">
+                            <img id="current-logo-img" src="" alt="Logo da Clínica" style="max-width: 200px; max-height: 100px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button id="btn-save-clinic-info" class="btn btn-primary">💾 Salvar Informações</button>
+                <button id="btn-upload-logo" class="btn btn-secondary">📤 Atualizar Logo</button>
+            </div>
+            <div id="clinic-config-status" class="status-message"></div>
+        </section>
+
+        <section class="hemogram-section">
+            <h3>Preencha os Dados do Hemograma</h3>
+            
+            <div class="species-selector">
+                <button id="btn-cao" class="btn btn-species active">🐕 Cão</button>
+                <button id="btn-gato" class="btn btn-species">🐈 Gato</button>
+            </div>
+            
+            <div class="hemogram-form">
+                <div class="card">
+                    <h4>Série Vermelha</h4>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="hemacias">Hemácias (10⁶/µL):</label>
+                            <input type="number" id="hemacias" class="form-control" step="0.1">
+                            <div id="ref-hemacias" class="reference"></div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="hemoglobina">Hemoglobina (g/dL):</label>
+                            <input type="number" id="hemoglobina" class="form-control" step="0.1">
+                            <div id="ref-hemoglobina" class="reference"></div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="hematocrito">Hematócrito (%):</label>
+                            <input type="number" id="hematocrito" class="form-control" step="0.1">
+                            <div id="ref-hematocrito" class="reference"></div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="reticulocitos">Reticulócitos (/µL):</label>
+                            <input type="number" id="reticulocitos" class="form-control">
+                            <div id="ref-reticulocitos" class="reference"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h4>Índices Eritrocitários</h4>
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="vcm">VCM (fL):</label>
+                            <input type="number" id="vcm" class="form-control" step="0.1">
+                            <div id="ref-vcm" class="reference"></div>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="hcm">HCM (pg):</label>
+                            <input type="number" id="hcm" class="form-control" step="0.1">
+                            <div id="ref-hcm" class="reference"></div>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="chcm">CHCM (%):</label>
+                            <input type="number" id="chcm" class="form-control" step="0.1">
+                            <div id="ref-chcm" class="reference"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h4>Série Branca</h4>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="leucocitos">Leucócitos (/µL):</label>
+                            <input type="number" id="leucocitos" class="form-control">
+                            <div id="ref-leucocitos" class="reference"></div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="segmentados">Segmentados (/µL):</label>
+                            <input type="number" id="segmentados" class="form-control">
+                            <div id="ref-segmentados" class="reference"></div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="linfocitos">Linfócitos (/µL):</label>
+                            <input type="number" id="linfocitos" class="form-control">
+                            <div id="ref-linfocitos" class="reference"></div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="monocitos">Monócitos (/µL):</label>
+                            <input type="number" id="monocitos" class="form-control">
+                            <div id="ref-monocitos" class="reference"></div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="eosinofilos">Eosinófilos (/µL):</label>
+                            <input type="number" id="eosinofilos" class="form-control">
+                            <div id="ref-eosinofilos" class="reference"></div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="basofilos">Basófilos (/µL):</label>
+                            <input type="number" id="basofilos" class="form-control">
+                            <div id="ref-basofilos" class="reference"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h4>Plaquetas e Proteínas</h4>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="plaquetas">Plaquetas (/µL):</label>
+                            <input type="number" id="plaquetas" class="form-control">
+                            <div id="ref-plaquetas" class="reference"></div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="proteina">Proteína Total (g/dL):</label>
+                            <input type="number" id="proteina" class="form-control" step="0.1">
+                            <div id="ref-proteina" class="reference"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button id="btn-analisar" class="btn btn-primary btn-lg">Analisar Hemograma</button>
+                    <button id="btn-limpar" class="btn btn-secondary">Limpar Campos</button>
+                </div>
+            </div>
+        </section>
+        
+        <section id="resultado-section" class="resultado-section card" style="display: none;">
+            <h3>Resultado da Análise</h3>
+            <div id="loading-results" class="loading">
+                <p>Analisando dados, por favor aguarde...</p>
+            </div>
+            <div id="results-content" style="display: none;">
+                <h4 id="diagnostico" class="diagnostico"></h4>
+                <div id="explicacao" class="explicacao"></div>
+                
+                <h4>Alterações Encontradas</h4>
+                <ul id="alteracoes" class="alteracoes"></ul>
+                
+                <h4>Recomendações</h4>
+                <div id="recomendacoes" class="recomendacoes"></div>
+                
+                <div class="report-actions">
+                    <h4>Gerar Laudos</h4>
+                    <button id="btn-laudo-tecnico" class="btn btn-primary">Laudo Técnico</button>
+                    <button id="btn-laudo-simplificado" class="btn btn-primary">Laudo para Tutor</button>
+                </div>
+            </div>
+            <div id="error-message" class="erro" style="display: none;"></div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <p>AnalisaVet - Sistema de Análise de Hemograma Veterinário</p>
+            <p class="disclaimer">Este sistema é uma ferramenta de apoio e não substitui a avaliação de um médico veterinário.</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/clinic_config.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/analysis.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/reports.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/debug.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/reference_fix.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
