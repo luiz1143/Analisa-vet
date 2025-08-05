@@ -63,21 +63,38 @@ def create_payment_preference():
 def payment_webhook():
     """Rota para receber notificações do Mercado Pago."""
     try:
+        # Log da requisição recebida
+        from flask import current_app
+        current_app.logger.info(f"Webhook recebido - Headers: {dict(request.headers)}")
+        current_app.logger.info(f"Webhook recebido - Body: {request.get_data(as_text=True)}")
+        
         # Verificar assinatura (se configurada)
         signature = request.headers.get('x-signature')
         if signature:
+            current_app.logger.info(f"Verificando assinatura: {signature}")
             if not PaymentService.verify_webhook_signature(request.data, signature):
+                current_app.logger.error("Assinatura inválida")
                 return jsonify({'error': 'Assinatura inválida'}), 401
+        else:
+            current_app.logger.warning("Webhook recebido sem assinatura")
         
         notification_data = request.json
+        if not notification_data:
+            current_app.logger.error("Dados de notificação vazios")
+            return jsonify({'error': 'Dados de notificação vazios'}), 400
+        
         success, message = PaymentService.process_webhook_notification(notification_data)
         
         if success:
+            current_app.logger.info(f"Webhook processado com sucesso: {message}")
             return jsonify({'status': 'ok', 'message': message}), 200
         else:
+            current_app.logger.error(f"Erro ao processar webhook: {message}")
             return jsonify({'error': message}), 400
             
     except Exception as e:
+        from flask import current_app
+        current_app.logger.error(f"Erro interno no webhook: {str(e)}", exc_info=True)
         return jsonify({'error': f'Erro interno: {str(e)}'}), 500
 
 @payment_bp.route('/api/payment/status/<payment_id>', methods=['GET'])

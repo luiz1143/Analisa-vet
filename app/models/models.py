@@ -120,3 +120,34 @@ class Analysis(db.Model):
     
     def __repr__(self):
         return f'<Analysis {self.id} for {self.patient_name}>'
+
+
+class Transaction(db.Model):
+    """Modelo para armazenar transações de pagamento."""
+    __tablename__ = 'transactions'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    payment_id = db.Column(db.String(100), unique=True, nullable=False)  # ID do pagamento no Mercado Pago
+    package_id = db.Column(db.String(10), nullable=False)  # ID do pacote de créditos
+    credits = db.Column(db.Integer, nullable=False)  # Quantidade de créditos
+    amount = db.Column(db.Float, nullable=False)  # Valor pago
+    status = db.Column(db.String(20), default='pending')  # pending, completed, failed
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    processed_at = db.Column(db.DateTime)
+    
+    # Relacionamento
+    user = db.relationship('User', backref='transactions')
+    
+    def mark_as_completed(self):
+        """Marca a transação como concluída."""
+        self.status = 'completed'
+        self.processed_at = datetime.datetime.utcnow()
+    
+    def mark_as_failed(self):
+        """Marca a transação como falhada."""
+        self.status = 'failed'
+        self.processed_at = datetime.datetime.utcnow()
+    
+    def __repr__(self):
+        return f'<Transaction {self.payment_id} - {self.status}>'
