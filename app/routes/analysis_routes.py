@@ -103,26 +103,47 @@ def analyze_hemogram():
         'raca': data.get('raca'),
         'idade': data.get('idade'),
         'sexo': data.get('sexo'),
-        'nome_tutor': data.get('nome_tutor')
+        'nome_tutor': data.get('nome_tutor'),
+        'especie': data.get('especie')
     }
     
     # Remover informações do paciente dos dados do hemograma
-    hemogram_data = {k: v for k, v in data.items() if k not in patient_info}
+    hemogram_data = {k: v for k, v in data.items() if k not in ['nome_paciente', 'raca', 'idade', 'sexo', 'nome_tutor', 'finalidade_exame']}
     
     result = AnalysisService.analisar_hemograma(hemogram_data, patient_info)
-    success = True
-    message = "Análise concluída com sucesso."
     
-    if success:
-        return jsonify({
-            'success': True,
-            'data': result
-        }), 200
-    else:
-        return jsonify({
-            'success': False,
-            'error': message
-        }), 400
+    # Formatar resultado para o frontend
+    formatted_result = {
+        'diagnostico': {
+            'diagnosticos': [interp['interpretacao'] for interp in result['interpretacoes_individuais']],
+            'explicacoes': [
+                {
+                    'interpretacao': interp['interpretacao'],
+                    'recomendacao': f"Monitorar {interp['parametro']} - {interp['tipo_alteracao']}"
+                } for interp in result['interpretacoes_individuais']
+            ]
+        },
+        'alteracoes': [
+            {
+                'parametro': param,
+                'valor': info['valor'],
+                'classificacao': 'alto' if 'alto' in info['status'] else 'baixo' if 'baixo' in info['status'] else 'normal',
+                'referencia': info['referencia']
+            } for param, info in result['parametros'].items() if info['alterado']
+        ],
+        'credits_remaining': current_user.credits - 1 if current_user.credits > 0 else 0
+    }
+    
+    # Atualizar créditos do usuário
+    if current_user.credits > 0:
+        current_user.credits -= 1
+        from ..models.models import db
+        db.session.commit()
+    
+    return jsonify({
+        'success': True,
+        'data': formatted_result
+    }), 200
 
 @analysis_bp.route('/api/analysis/upload', methods=['POST'])
 @login_required

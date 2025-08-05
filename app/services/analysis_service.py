@@ -157,18 +157,23 @@ class AnalysisService:
         return interpretacoes
     
     @staticmethod
-    def analisar_hemograma(dados_hemograma, dados_paciente):
+    def analisar_hemograma(dados_hemograma, dados_paciente=None):
         """
         Analisa um hemograma completo aplicando as regras de 15% e interpretação conjunta.
         
         Args:
             dados_hemograma: Dados do hemograma
-            dados_paciente: Dados do paciente
+            dados_paciente: Dados do paciente (opcional)
             
         Returns:
             dict: Análise completa do hemograma
         """
-        especie = dados_paciente.get("especie", "Cão")
+        # Se dados_paciente não foi fornecido, extrair da estrutura de dados_hemograma
+        if dados_paciente is None:
+            dados_paciente = {}
+        
+        # Verificar se especie está nos dados do hemograma ou do paciente
+        especie = dados_paciente.get("especie") or dados_hemograma.get("especie", "Cão")
         valores_referencia = AnalysisService.VALORES_REFERENCIA.get(especie, {})
         
         resultados = {
@@ -213,6 +218,8 @@ class AnalysisService:
         resultados["recomendacoes"] = AnalysisService._gerar_recomendacoes(resultados)
         
         resultados["diagnosticos"] = resultados["interpretacoes_individuais"] + resultados["interpretacoes_conjuntas"]
+        
+        return resultados
     
     @staticmethod
     def _obter_interpretacao_parametro(parametro, tipo_alteracao, especie):

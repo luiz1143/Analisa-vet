@@ -52,10 +52,11 @@ def processar_arquivo_csv(caminho_csv):
         caminho_csv: Caminho para o arquivo CSV
         
     Returns:
-        dict: Dados processados do hemograma
+        dict: Dados processados do hemograma e paciente
     """
     try:
-        dados = {}
+        dados_hemograma = {}
+        dados_paciente = {}
         
         with open(caminho_csv, 'r', encoding='utf-8') as arquivo:
             # Detectar delimitador
@@ -66,20 +67,57 @@ def processar_arquivo_csv(caminho_csv):
             
             reader = csv.DictReader(arquivo, delimiter=delimiter)
             
+            # Campos do hemograma
+            campos_hemograma = {
+                'hemacias', 'hemoglobina', 'hematocrito', 'vcm', 'hcm', 'chcm',
+                'leucocitos', 'segmentados', 'linfocitos', 'monocitos', 
+                'eosinofilos', 'basofilos', 'plaquetas', 'proteina', 'reticulocitos'
+            }
+            
+            # Campos do paciente
+            campos_paciente = {
+                'nome', 'tutor', 'raca', 'idade', 'sexo', 'especie'
+            }
+            
             for row in reader:
                 for key, value in row.items():
                     if key and value:
-                        # Tentar converter para float se possível
-                        try:
-                            dados[key.strip().lower()] = float(value.strip())
-                        except ValueError:
-                            dados[key.strip().lower()] = value.strip()
+                        key_clean = key.strip().lower()
+                        value_clean = value.strip()
+                        
+                        # Verificar se é campo do hemograma
+                        if key_clean in campos_hemograma:
+                            try:
+                                dados_hemograma[key_clean] = float(value_clean.replace(',', '.'))
+                            except ValueError:
+                                continue
+                        
+                        # Verificar se é campo do paciente
+                        elif key_clean in campos_paciente:
+                            if key_clean == 'sexo':
+                                if value_clean.lower() in ['m', 'macho']:
+                                    dados_paciente[key_clean] = 'Macho'
+                                elif value_clean.lower() in ['f', 'fêmea', 'femea']:
+                                    dados_paciente[key_clean] = 'Fêmea'
+                            elif key_clean == 'especie':
+                                if value_clean.lower() in ['cão', 'cao', 'canino']:
+                                    dados_paciente[key_clean] = 'Cão'
+                                elif value_clean.lower() in ['gato', 'felino']:
+                                    dados_paciente[key_clean] = 'Gato'
+                            else:
+                                dados_paciente[key_clean] = value_clean.title()
         
-        return dados
+        return {
+            'hemograma': dados_hemograma,
+            'paciente': dados_paciente
+        }
         
     except Exception as e:
         print(f"Erro ao processar CSV: {e}")
-        return {}
+        return {
+            'hemograma': {},
+            'paciente': {}
+        }
 
 def processar_arquivo_hemograma(arquivo):
     """
@@ -130,12 +168,13 @@ def extrair_dados_hemograma_texto(texto):
         texto: Texto extraído do PDF
         
     Returns:
-        dict: Dados estruturados do hemograma
+        dict: Dados estruturados do hemograma e paciente
     """
-    dados = {}
+    dados_hemograma = {}
+    dados_paciente = {}
     
-    # Padrões regex para extração de dados
-    padroes = {
+    # Padrões regex para extração de dados do hemograma
+    padroes_hemograma = {
         'hemacias': r'hem[aá]cias?\s*:?\s*([0-9,\.]+)',
         'hemoglobina': r'hemoglobina\s*:?\s*([0-9,\.]+)',
         'hematocrito': r'hemat[oó]crito\s*:?\s*([0-9,\.]+)',
@@ -149,20 +188,52 @@ def extrair_dados_hemograma_texto(texto):
         'eosinofilos': r'eosin[oó]filos?\s*:?\s*([0-9,\.]+)',
         'basofilos': r'bas[oó]filos?\s*:?\s*([0-9,\.]+)',
         'plaquetas': r'plaquetas?\s*:?\s*([0-9,\.]+)',
-        'proteina_total': r'prote[ií]na\s*total\s*:?\s*([0-9,\.]+)',
+        'proteina': r'prote[ií]na\s*total\s*:?\s*([0-9,\.]+)',
         'reticulocitos': r'retic[uú]l[oó]citos?\s*:?\s*([0-9,\.]+)'
+    }
+    
+    # Padrões regex para extração de dados do paciente
+    padroes_paciente = {
+        'nome': r'(?:nome|paciente)\s*:?\s*([a-zA-ZÀ-ÿ\s]+?)(?:\s|$|;|,|\n)',
+        'tutor': r'(?:tutor|propriet[aá]rio|dono)\s*:?\s*([a-zA-ZÀ-ÿ\s]+?)(?:\s|$|;|,|\n)',
+        'raca': r'ra[çc]a\s*:?\s*([a-zA-ZÀ-ÿ\s]+?)(?:\s|$|;|,|\n)',
+        'idade': r'idade\s*:?\s*([0-9]+\s*(?:anos?|meses?|dias?)?)',
+        'sexo': r'sexo\s*:?\s*(macho|f[êe]mea|m|f)',
+        'especie': r'esp[eé]cie\s*:?\s*(c[ãa]o|gato|canino|felino)'
     }
     
     texto_lower = texto.lower()
     
-    for campo, padrao in padroes.items():
+    # Extrair dados do hemograma
+    for campo, padrao in padroes_hemograma.items():
         match = re.search(padrao, texto_lower, re.IGNORECASE)
         if match:
             try:
                 valor = match.group(1).replace(',', '.')
-                dados[campo] = float(valor)
+                dados_hemograma[campo] = float(valor)
             except ValueError:
                 continue
     
-    return dados
+    # Extrair dados do paciente
+    for campo, padrao in padroes_paciente.items():
+        match = re.search(padrao, texto_lower, re.IGNORECASE)
+        if match:
+            valor = match.group(1).strip()
+            if campo == 'sexo':
+                if valor.lower() in ['m', 'macho']:
+                    dados_paciente[campo] = 'Macho'
+                elif valor.lower() in ['f', 'fêmea', 'femea']:
+                    dados_paciente[campo] = 'Fêmea'
+            elif campo == 'especie':
+                if valor.lower() in ['cão', 'cao', 'canino']:
+                    dados_paciente[campo] = 'Cão'
+                elif valor.lower() in ['gato', 'felino']:
+                    dados_paciente[campo] = 'Gato'
+            else:
+                dados_paciente[campo] = valor.title()
+    
+    return {
+        'hemograma': dados_hemograma,
+        'paciente': dados_paciente
+    }
 
